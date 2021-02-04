@@ -1,4 +1,4 @@
 # videojuego-nave-espacial
 
 Ejemplo de juego con javascript desde html.
-No es de codigo perfecto ya que lo hice rapido y por entretenimiento y ejemplo: https://nestor-b.github.io/videojuego-nave-espacial/
+Lo hice como ejemplo rapido y por entretenimiento: https://nestor-b.github.io/videojuego-nave-espacial/
