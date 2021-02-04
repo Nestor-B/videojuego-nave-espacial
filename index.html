@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Juego</title>
+	    <link href="https://animate.style/animate.min.css" rel="stylesheet">
+	    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+		<style>
+			*{margin:0;padding:0;box-sizing:border-box;transition: 0ms;color: #fff;user-select: none;}
+			body{overflow: hidden;width: 100%;}
+			
+			input, button, a, details {cursor: pointer;}
+			
+			h1{font-size: 4em;font-family: arial;}
+
+			.modal{position: fixed;top: 0;left: 0;width: 100%;height: 100vh;background: #101010;display: flex;align-items: center;justify-content: center;z-index: 10;}
+			.modal .controlInicial{min-width: 400px;max-width: 400px;min-height: 100px;background:url(img/backfondo.png) 0% 0%/250px 250px;padding: 2em .05em .05em;}
+			.modal .controlInicial .btn-inicial{padding: 1em;border:0;outline: 0;background: green;min-width: 100%;cursor: pointer;}
+			.modal .controlInicial div.titulo{background: #050505;background: url(./img/nave.png) no-repeat 20px -10px;font-size: 2em;text-align: center;display: flex;align-items: flex-end;height: 150px;padding: 0 1em;}
+			.modal .controlInicial div.titulo p{text-shadow: 0 2px 1px #000, 0 -1px 1px #000;font-weight: bold;}
+			.modal .controlInicial div.descripcion{padding: 1em 2em;text-align: justify;}
+
+			#app{height: 100vh;background:url(./img/backfondo.png) 0% 0%/250px 250px;width:100%;position: relative;display: none;animation: moverFondo 5s infinite linear;}
+			#app #nave{width: 55px;height:25px;background: url(./img/nave.png) no-repeat center center/100% 100%;position: absolute;left: 100px;border: 1px solid transparent;}
+			#app .bala{position: absolute;width: 10px;height: 10px;background: #fff;border-radius: 50%;box-shadow: 0 0 5px 1px #fff;}
+			#app .Dovni{position: absolute;width: 10px;height: 10px;left: 100%;top: 100%;border-radius: 50%;background: red;box-shadow: 0 0 5px 1px red;}
+			#app .ovni{position: absolute;width: 45px;height:25px;background: url(./img/ovni.png) no-repeat center center/100% 100%;left: 1200px;}
+
+			.explosion{background:url(https://opengameart.org/sites/default/files/Explosion_2.png) no-repeat -195px -10px;}
+
+			[autofocus]:focus{
+				box-shadow: 0 0 3px 2px #000;
+			}
+
+			@keyframes moverFondo {
+				from{
+					background-position: 0% 0;
+				}
+				to{
+					background-position: -250px 0;
+				}
+			}
+			@keyframes moverFondo2 {
+				from{
+					background-position: 0% 0;
+				}
+				to{
+					background-position: -250px 0;
+				}
+			}
+			.panel{
+				/*background: linear-gradient(rgb(255,0,0,.5), transparent);*/
+				font-size: 19px;
+				position: fixed;
+				bottom: 0px;
+				width: 100%;
+				padding: 1em;
+				display: flex;
+				justify-content: flex-end;
+			}
+			.panel span:nth-child(1){
+				padding: 0px;
+			}
+			.panel .puntos, .panel .vidas, .panel .tiempo{
+				display: flex;
+				align-items: center;
+				justify-content: flex-end;
+				text-align: right;
+				
+				font-size: 2em;
+				padding: 0 15px;
+			}
+			/*.panel .puntos{background: red;}
+			.panel .vidas{background: orange;}
+			.panel .tiempo{background: brown;}*/
+			.panel .puntos b:first-child, .panel .vidas b:first-child, .panel .tiempo b:first-child{
+				font-size: 1.3em;
+				text-align: center;
+				padding: 0 10px;
+			}
+			.panel .puntos b:nth-child(2), .panel .vidas b:nth-child(2), .panel .tiempo b:nth-child(2){
+				font-size:  0.50em;
+			}
+			
+			#laser{width: 5px;height: 0%;top:0;bottom:0; position: absolute;background: lightblue;box-shadow: 0 0 20px 5px lightblue;margin: auto;border-radius: 0%;transition: 333ms;z-index: 11;}
+			
+			.flex{display: flex;align-items: center;}
+			.flex > *:first-child{margin: 0 5px;}
+			.text-center{text-align: center;justify-content: center;margin: 15px 0 0;}
+			h1{text-align: center;}
+			button{display: block;width: 100%;color: #010101;}
+		</style>
+	</head>
+	<body>
+		
+		<div id="modal" class="modal">
+			<div class="controlInicial" id="controlInicial">
+				<div class="titulo">
+					<p>Nave Espacial</p>	
+				</div>
+				<div class="descripcion">
+					<p>
+						Las naves enemigas van de camino a invadir el planeta tierra, 
+						ahora solo usted puede salvarlo.
+						<br>
+						Destruya y siga as&iacute; avanzando hasta deshacer las 100 naves enemigas.
+					</p>
+					<br>
+					<details>
+  						<summary>Detalles</summary>
+ 						<blockquote>
+  							<small>
+  								<b>Importante:</b> Debes siempre disparar con el fin de destruir las naves y evitar que el espacio se llene de ellas. 
+  							</small>
+  						</blockquote> 						
+  						<blockquote>
+  							<small>
+  								<b>Control:</b> Use las teclas de flecha arriba y abajo para moverse.
+  							</small>
+  						</blockquote>
+  						<blockquote>
+  							<small>
+  								<b>Disparos:</b> Use la tecla ENTER.
+  							</small>
+  						</blockquote>
+					</details>
+					<br>
+					<hr>
+					<br>
+					<dl class="setting">
+						<dl class="flex centrado dificultad">
+							<small>Disparo Automatico</small> 
+							<input type="checkbox" name="a" onchange="DisparoAutomatico(this.checked)" />
+						</dl>
+						<dl class="flex centrado dificultad">
+							<small>Dificulta:</small> 
+							<input type="range" min="0" max="1" value="0" onchange="setDificultad(this.value)" />
+						</dl>
+					</dl>
+					<br>
+					<button autofocus="true" class="btn-inicial" onclick="iniciar()">Iniciar</button>
+					<p class="flex text-center">
+						<i class="large material-icons">announcement</i> <small>Use <abbr title="">webkit</abbr> como motor de renderizado.</small>
+					</p>
+				</div>
+			</div>
+		</div>
+		
+		<div id="app">
+			<div class="panel">
+				<span class="tiempo">
+					<b class="large material-icons" style="color:white;">access_time</b>
+					<b id="Ctimes">0 s</b> 
+				</span>				
+				<span class="vidas">
+					<b class="large material-icons" id="fv" style="color:red;">favorite</b>
+					<b id="Cfavorites"></b> 
+				</span>				
+				<span class="puntos">
+					<b class="large material-icons" id="gd" style="color:yellow;">grade</b>
+					<b id="Cpuntos"></b> 
+				</span>
+			</div>			
+		</div>
+		
+		<script>
+			w=window
+			d=document
+			
+			audioDOvni = null
+			
+			puntos=0
+			perdidas=10
+
+			mbalas=null
+			mcolision=null
+			cOvnis=null 
+			mOvnis=null
+			detonarD=null
+			iTiempo=null
+			
+			agresividadOvni=[11,21,31,41,51,61,71,81,91]
+			nave=null
+			laser=null
+			
+			var Arg = []
+			
+			var ActiveDisparoAutomatico = null
+
+			var Dificultad = 15
+			var Distancia  = 5000
+			
+			setDificultad = function(e){
+				if(e && e == "1" || e == 1){					
+					Dificultad = 7
+					Distancia  = 3500 //creando				
+				}
+			}
+
+			detenerDisparosOvni=false
+			
+			function getRandom(min, max) {
+				console.clear()
+  				return Math.floor(Math.random() * (max - min)) + min;
+			}
+			
+			//control
+			control=function(){
+				if( event.keyCode==38 ){
+					if(nave && nave.offsetTop > -10){
+						nave.style.top = (--nave.offsetTop-5)+'px'
+					}
+				}
+				if( event.keyCode==40 ){
+					if(nave && nave.offsetTop<innerHeight-10){	
+						nave.style.top = (++nave.offsetTop+5)+'px'
+					}
+				}
+				if( event.keyCode==13 ){
+					crearDisparos()
+				}
+			}
+			
+			explosion=function(e){
+				var px=[(195*1), (195+90), (195+192), (195+285), (195+570)]
+				var exp=d.createElement('div')
+				exp.style.top=(e.offsetTop-(e.offsetHeight))+'px'
+				exp.style.left=(e.offsetLeft-(e.offsetHeight/2))+'px'
+				exp.className='explosion'
+				
+				exp.style.width='90px'
+				exp.style.height='90px'
+				exp.style.position='absolute'
+				exp.style.background='url(./img/Explosion_2.png)'
+				exp.style.backgroundPosition='-195px -10px'
+				setTimeout((e)=>{
+					e.style.backgroundPosition='-'+px[0]+'px -10px !important'
+					/*if( audioExplosion.paused || audioExplosion.ended ){
+						audioExplosion.play()
+					}*/
+					audioExplosion=new Audio('./audio/explosion.mp3')
+					audioExplosion.volume = 0.1
+					audioExplosion.addEventListener('canplay',()=>{
+						audioExplosion.play()
+					})
+				}, 100, exp)
+				setTimeout((e)=>{
+					e.style.backgroundPosition='-'+px[0]+'px -10px'
+				}, 0, exp)
+				setTimeout((e)=>{
+					e.style.backgroundPosition='-'+px[1]+'px -10px'
+				}, 50, exp)
+				setTimeout((e)=>{
+					e.style.backgroundPosition='-'+px[2]+'px -5px'
+				}, 200, exp)
+				setTimeout((e)=>{
+					e.style.backgroundPosition='-'+px[3]+'px -5px'
+				}, 250, exp)
+				setTimeout((e)=>{
+					e.style.backgroundPosition='-'+px[4]+'px -5px'
+				}, 300, exp)
+				
+				setTimeout((e)=>{
+					app.removeChild(e)
+				}, 350, exp)
+				
+				app.appendChild(exp)
+			}
+			
+			DetenerTodo=function(o=null, n=null){
+				modal.style.cssText=`display:flex;background:transparent !important;`
+				controlInicial.innerHTML=`
+					<p>
+						<h1>Perdiste</h1>
+						<button onclick='location.reload()'>Reiniciar</button>
+					</p>
+				`
+				if(n){explosion(n)}
+				if(n){app.removeChild(n)}
+				if(o){app.removeChild(o)}
+				clearTimeout(mcolision, 1000)
+				clearTimeout(mbalas, 1000)
+				clearTimeout(cOvnis, 1000)
+				clearTimeout(mOvnis, 1000)
+				clearInterval(detonarD, 1000)
+				clearInterval(iTiempo, 1000)
+				nave=null
+				audioFondo.pause()
+				detenerDisparosOvni=true
+				app.style.animationPlayState="paused"
+
+				//GameOver
+			}
+			
+			detectarColision=function(){
+				var b=d.querySelectorAll('.bala')
+				var o=d.querySelectorAll('.ovni')
+				var o2=d.querySelectorAll('.ovni')
+				var Dovni=d.querySelectorAll('.Dovni')
+				var Dovni2=d.querySelectorAll('.Dovni')
+				b.forEach((a)=>{
+					o.forEach((e)=>{
+						if(a.offsetLeft>=e.offsetLeft&&a.offsetLeft<=e.offsetLeft+e.offsetHeight 
+							&& a.offsetTop>=e.offsetTop-6&&a.offsetTop<=e.offsetTop+e.offsetHeight){
+							explosion(e)
+							app.removeChild(a)
+							app.removeChild(e)
+							puntos++
+							Cpuntos.innerText=puntos
+							gd.classList.add('animate__animated', 'animate__bounce')
+							gd.addEventListener('animationend', () => {
+								gd.classList.remove('animate__bounce')
+							})
+						}
+					})					
+				})
+				o.forEach((e)=>{
+					if(nave && nave.offsetLeft+nave.offsetWidth/2>=e.offsetLeft&&nave.offsetLeft<=e.offsetLeft+e.offsetHeight 
+						&& nave.offsetTop>=e.offsetTop-nave.offsetHeight&&nave.offsetTop<=e.offsetTop+e.offsetHeight){
+						explosion(nave, e)
+						DetenerTodo(nave, e)
+					}					
+				})
+				Dovni.forEach((e)=>{
+					if(e.offsetLeft != 1200){
+						e.style.background = 'red'
+					}
+					if(nave && nave.offsetLeft+nave.offsetWidth/2>=e.offsetLeft&&nave.offsetLeft<=e.offsetLeft
+						&& nave.offsetTop+nave.offsetHeight>=e.offsetTop&&nave.offsetTop-e.offsetHeight<=e.offsetTop){
+						app.removeChild(e)
+						explosion(nave)
+						DetenerTodo(nave)	
+							
+					}
+										
+				})
+				
+				//--laser
+				Dovni2.forEach((e)=>{
+					if(laser && laser.offsetLeft+laser.offsetWidth/2>=e.offsetLeft&&laser.offsetLeft<=e.offsetLeft+e.offsetHeight 
+						&& laser.offsetTop>=e.offsetTop-laser.offsetHeight&&laser.offsetTop<=e.offsetTop+e.offsetHeight){
+						explosion(e)
+						app.removeChild(e)
+					}					
+				})
+				
+				o2.forEach((e)=>{
+					if(laser && laser.offsetLeft+laser.offsetWidth/2>=e.offsetLeft&&laser.offsetLeft<=e.offsetLeft+e.offsetHeight 
+						&& laser.offsetTop>=e.offsetTop-laser.offsetHeight&&laser.offsetTop<=e.offsetTop+e.offsetHeight){
+						explosion(e)
+						puntos++
+						Cpuntos.innerText=puntos
+						app.removeChild(e)
+					}					
+				})
+				
+				if(perdidas<=0){
+					DetenerTodo(nave)
+				}
+				
+				mcolision=setTimeout(detectarColision,1)
+			}	
+			
+			//Nave
+			moverBalas=function(){
+				d.querySelectorAll('.bala').forEach((e)=>{
+					if(e && e.offsetLeft > innerWidth){
+						app.removeChild(e)
+					}
+					e.style.left = (++e.offsetLeft+10)+'px'
+				})
+				d.querySelectorAll('.Dovni').forEach((e)=>{
+					if(e && e.offsetLeft < -e.offsetWidth){
+						app.removeChild(e)
+					}
+					e.style.left = (--e.offsetLeft-10)+'px'
+				})
+				//
+				mbalas=setTimeout(moverBalas, 40)
+			}
+			var activarDisparosNave = true
+			crearDisparos=function(){
+				if(nave && activarDisparosNave){
+					activarDisparosNave=false 
+					if(nave){
+						disparoNave=new Audio('./audio/disparoNave.mp3')
+						disparoNave.volume = 0.1
+						disparoNave.addEventListener('canplay',()=>{
+							disparoNave.play()
+						})						
+					}
+
+					var dp=d.createElement('div')
+					dp.className='bala'
+					dp.style.top=(nave.offsetTop+8)+'px'
+					dp.style.left=(nave.offsetLeft+40)+'px'
+					app.appendChild(dp)
+					setTimeout(function(){
+						activarDisparosNave=true
+					},  ActiveDisparoAutomatico === null?300:300)						
+				}
+			}
+			crearNave=function(){
+				nave=d.createElement('div')
+				nave.id='nave'
+				nave.style.top=(innerHeight/2)+'px'
+				app.appendChild(nave)
+				d.addEventListener('keydown',control)
+			}
+			
+			//Ovnis
+			var ActiveLaser = false
+			crearOvnis=function(){
+				if(detenerDisparosOvni === false && d.querySelectorAll('.ovni').length <= 8){
+					var ovni=d.createElement('div')
+				
+				
+					if( getRandom(1, 10)%2==0 ){
+						ovni.style.background='url(./img/ovni2.png) no-repeat center center/100% 100%'
+					}
+					if( getRandom(1, 10)%4==0 ){
+						ovni.style.background='url(./img/ovni3.png) no-repeat center center/100% 100%'
+					}
+					
+					if( perdidas >= 9 && puntos == 12 ){
+						//Lase de poder
+						if(ActiveLaser === false){
+							ActiveLaser = true
+							crearLaser()
+						}
+					}				
+					
+					for(var i=0;i<agresividadOvni.length;i++){
+						if( puntos >= agresividadOvni[0] && puntos <= agresividadOvni[1] ){
+							ovni.setAttribute('data-move', getRandom(1,1))
+							ovni.style.top=nave.offsetTop+'px'
+						}
+						else if( puntos >= agresividadOvni[2] && puntos <= agresividadOvni[3] ){
+							ovni.setAttribute('data-move', getRandom(3,6))
+							ovni.style.top=nave.offsetTop+'px'
+						}
+						else if( puntos >= agresividadOvni[4] && puntos <= agresividadOvni[5] ){
+							ovni.setAttribute('data-move', getRandom(5,10))
+							ovni.style.top=nave.offsetTop+'px'
+						}
+						else if( puntos >= agresividadOvni[6] && puntos <= agresividadOvni[7] ){
+							ovni.setAttribute('data-move', getRandom(30,35))
+							ovni.style.top==getRandom(25, innerHeight-50)+'px'
+						}
+						else if( puntos >= 100 ){ //FIN | GANASTE
+							//terminar todo
+							//Ganaste
+							d.querySelectorAll('.ovni').forEach((e)=>{
+								if(!ActiveLaser){
+									if( Dificultad === 15 ){
+										crearLaser(60)
+										ActiveLaser=true										
+									}
+									setTimeout(()=>{
+										app.removeChild(laser)
+										nave.style.cssText+=`transition:1s;left:101%;`
+									},5000)
+								}
+								clearInterval(iTiempo, 1000)
+								detenerDisparosOvni=true
+								//DetenerTodo(e)
+							})
+							modal.style.cssText=`display:flex;background:transparent !important;`
+							controlInicial.style.cssText=`background:transparent;text-align:center;`
+							controlInicial.innerHTML=`
+							<group>
+								<h2>Fin de Juego</h2>
+								<h1 onclick='location.reload()'>Ganaste</h1>
+							</group>
+							<br>
+							<br>
+							<p><span>Creado por <a href="mailto:benjamincanario09@gmail.com">Benjamin</a></span></p>
+							`
+							app.style.cssText+=`transition:1s; animation: moverFondo2 800ms infinite linear`
+						}
+						else{				
+							ovni.setAttribute('data-move', getRandom(1,Dificultad)) //Dificultad
+							ovni.style.top=getRandom(25, innerHeight-50)+'px'
+							//ovni.style.top=nave.offsetTop+'px'
+						}
+					}
+		
+					ovni.classList.add('ovni')
+					ovni.style.left=innerWidth+'px'
+					
+					var event = new Event('D');
+					ovni.addEventListener('D', function(){
+						setTimeout(D, 100, ovni)
+					})
+					ovni.dispatchEvent(event);
+					
+					cOvnis=setTimeout(crearOvnis, getRandom(1000,Distancia)) //Distancia
+					app.appendChild(ovni)
+				
+				}
+			}
+			DisparoOvni=function(e){
+				if(e && e.offsetLeft != 0){
+					var Dovni=d.createElement('div')
+					Dovni.className='Dovni'
+					Dovni.style.position='absolute'
+					Dovni.style.left=(e.offsetLeft)+'px'
+					Dovni.style.top=(e.offsetTop+8)+'px'
+					if(nave && Dovni){
+						audioDOvni=new Audio('./audio/D.mp3')		
+						audioDOvni.volume = 0.3
+						audioDOvni.type="application/ogg"
+						audioDOvni.addEventListener('canplay',()=>{
+							audioDOvni.play()
+						})						
+					}
+					app.appendChild(Dovni)		
+				}
+			}
+			D=function(e){
+				if(e){
+					var t=e.getAttribute('data-move')?e.getAttribute('data-move'):100000
+					detonarD=setInterval((e)=>{
+						if(detenerDisparosOvni === false){
+							DisparoOvni(e)
+						}
+					}, eval(''+t+'000'), e)									
+				}
+			}
+			moverOvnis=function(){
+				d.querySelectorAll('.ovni').forEach((e)=>{
+					if(e && e.offsetLeft < 0-e.offsetWidth && puntos != 100){
+						app.removeChild(e)
+						perdidas--
+						Cfavorites.innerText=perdidas
+						
+						fv.classList.add('animate__animated', 'animate__shakeX')
+						fv.addEventListener('animationend', () => {
+							fv.classList.remove('animate__shakeX')
+						})
+						if(perdidas<=0){
+							d.querySelectorAll(".ovni").forEach((e)=>{
+								DetenerTodo(e, nave)
+							})
+						}
+					}
+					e.style.left = (--e.offsetLeft-(e.getAttribute('data-move')))+'px'
+				})
+				mOvnis=setTimeout(moverOvnis, 40)
+			}
+			var segundos = 0
+			iniciarTiempo=function(){
+				var hour = Math.floor(segundos / 3600);
+  				hour = (hour < 10)? '0' + hour : hour;
+  				var minute = Math.floor((segundos / 60) % 60);
+  				minute = (minute < 10)? '0' + minute : minute;
+  				var second = segundos % 60;
+  				second = (second < 10)? '0' + second : second;
+  				
+				Ctimes.innerText=hour + ':' + minute + ':' + second
+				segundos++
+				iTiempo=setTimeout(iniciarTiempo, 1000)
+			}
+			
+			crearLaser=function(e){
+				var Movida = e || 5
+				laser=d.createElement('div')
+				laser.id='laser'
+				laser.className='laser'
+				
+				setTimeout((e)=>{
+					e.style.height="100%"
+				}, 1000, laser)
+				
+				var event = new Event('L');
+				laser.addEventListener('L', function(){
+					
+					var mvLS=setInterval((e)=>{
+						if(e.offsetLeft > innerWidth){
+							e.style.height="0%"
+							e.style.top=innerHeight+'px'
+							clearInterval(mvLS, 000)
+						}else{						
+							if(Movida){
+								e.style.left = (++e.offsetLeft+Movida)+'px'
+							}else{
+								e.style.left = (++e.offsetLeft+5)+'px'
+							}							
+						}
+					}, 150, this)
+					
+				})
+				laser.dispatchEvent(event);								
+				laser.style.left=(nave.offsetLeft + 15) + 'px'
+
+				audioLaser=new Audio('./laser.mp3')		
+				audioLaser.volume = 0.3
+				audioLaser.type="application/ogg"
+				audioLaser.addEventListener('canplay',()=>{
+					audioLaser.play()
+				})			
+				
+				app.appendChild(laser)
+			}
+			
+			iniciar=function(){
+				//Iniciar
+				modal.style.display='none'		
+				app.style.display='block'
+
+				//tiempo
+				iniciarTiempo()
+
+				//crear
+				crearNave()
+				crearOvnis()
+				
+				//mover
+				moverBalas()				
+				moverOvnis()		
+				
+				//colision
+				detectarColision()
+				
+				
+				audioFondo=new Audio('./audio/audioFondo.ogg')
+				audioFondo.volume = 0.3
+				audioFondo.addEventListener('canplay',()=>{
+					audioFondo.play()
+				})				
+								
+				Cpuntos.innerText=puntos
+				Cfavorites.innerText=perdidas
+								
+			}
+			
+			DisparoAutomatico=function(e){
+				localStorage.setItem('DisparoAutomatico', e)
+				if( localStorage.getItem('DisparoAutomatico') ){
+					ActiveDisparoAutomatico = setInterval(crearDisparos, 300)
+				}
+			}
+
+		</script>
+		
+	</body>
+</html>
